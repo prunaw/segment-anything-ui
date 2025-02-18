@@ -119,9 +119,14 @@ class SettingsLayout(QWidget):
         self._load_image(file)
 
     def _load_image(self, file: str):
-        mask = file.split(".")[0] + self.MASK_EXTENSION
-        labels = file.split(".")[0] + self.LABELS_EXTENSION
-        bounding_boxes = file.split(".")[0] + self.BOUNDING_BOXES_EXTENSION
+        postfix = '.' + file.split('.')[-1]
+        mask = file.replace(postfix, self.MASK_EXTENSION)
+        labels = file.replace(postfix, self.LABELS_EXTENSION)
+        bounding_boxes = file.replace(postfix, self.BOUNDING_BOXES_EXTENSION)
+
+        # mask = file.split(".")[0] + self.MASK_EXTENSION
+        # labels = file.split(".")[0] + self.LABELS_EXTENSION
+        # bounding_boxes = file.split(".")[0] + self.BOUNDING_BOXES_EXTENSION
         image = cv2.imread(file, cv2.IMREAD_UNCHANGED)
         self.actual_shape = image.shape[:2][::-1]
         self.actual_file = file
@@ -173,13 +178,13 @@ class SettingsLayout(QWidget):
             masks.append(single_mask)
             new_labels.append(class_)
         self.parent().annotator.masks = MasksAnnotation.from_masks(masks, new_labels)
-        
+
     def _load_bounding_boxes(self, bounding_boxes):
         with open(bounding_boxes, "r") as f:
             bounding_boxes: list[dict[str, float | str]] = json.load(f)
         for bounding_box in bounding_boxes:
             self.parent().annotator.bounding_boxes.append(BoundingBox(**bounding_box))
-    
+
     def on_show_image(self):
         self.parent().set_image(self.original_image, clear_annotations=False)
 
@@ -211,7 +216,7 @@ class SettingsLayout(QWidget):
         random.shuffle(files)
         self.files.add_files(files)
         self.on_next_file()
-        
+
     def on_save_bounding_boxes(self):
         path = os.path.split(self.actual_file)[0]
         basename = pathlib.Path(self.actual_file).stem
@@ -220,9 +225,9 @@ class SettingsLayout(QWidget):
         bounding_boxes_dict = [bounding_box.to_dict() for bounding_box in bounding_boxes]
         with open(bounding_boxes_path, "w") as f:
             json.dump(bounding_boxes_dict, f, indent=4)
-   
+
     def is_show_bounding_boxes(self):
         return self.show_bounding_boxes.isChecked()
-    
+
     def on_show_bounding_boxes(self):
         self.parent().update(self.parent().annotator.merge_image_visualization())
