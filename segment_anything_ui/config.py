@@ -72,7 +72,7 @@ class Config:
     ] = "sam_hq_vit_h.pth"
     download_weights_if_not_available: bool = True
     label_file: str = "labels.json"
-    window_size: tuple[int, int] | int = (1920, 1080)
+    window_size: tuple[int, int] | int = (800, 600)
     key_mapping: KeyBindings = dataclasses.field(default_factory=KeyBindings)
     weights_paths: dict[str, str] = dataclasses.field(default_factory=lambda: {
         "l2": "https://huggingface.co/han-cai/efficientvit-sam/resolve/main/l2.pt",
